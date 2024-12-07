@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Profit and Loss Chart</title>
+    <link rel="stylesheet" href="graphpage.css"> <!-- Link to CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js library -->
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Profit and Loss Chart</h1>
+        <div class="input-container">
+            <input type="text" id="companyName" placeholder="Enter Stock Symbol (e.g., AAPL)">
+            <button id="submitBtn">Get Chart</button>
+        </div>
+        <canvas id="stockChart"></canvas> <!-- Canvas for Chart.js -->
+    </div>
+    <script src="graphpage.js"></script> <!-- Your custom script -->
+</body>
+</html>

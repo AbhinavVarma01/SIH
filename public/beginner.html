@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beginner's Guide | Pioneer Solutions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Beginner's Guide!</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Getting Started with Investing</h2>
+            <p>This guide will help you understand the basics of investing in stocks, mutual funds, and other financial products.</p>
+            <p>Explore various topics, tips, and resources to build your investment knowledge!</p>
+        </section>
+    </main>
+    <footer>
+        <button onclick="logout()">Logout</button>
+    </footer>
+
+    <script>
+        function logout() {
+            // Here you might implement the logout functionality
+            fetch('/api/logout', {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(() => {
+                // Redirect back to login page after logout
+                window.location.href = 'login.html'; // Change this to your login page's file name
+            })
+            .catch(err => console.error('Error during logout:', err));
+        }
+    </script>
+</body>
+</html>

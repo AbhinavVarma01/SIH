@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutual Fund Data</title>
+    <link rel="stylesheet" href="MutualFunds.css">
+</head>
+<body>
+    <h1>Mutual Fund Information</h1>
+    <div id="mutual-fund-data"></div>
+
+    <script>
+        // Fetch mutual fund data from the Express server
+        fetch('/api/mutual-funds')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('mutual-fund-data');
+                // Process and display data
+                data.forEach(fund => {
+                    const fundElement = document.createElement('div');
+                    fundElement.classList.add('fund'); // Optional: for CSS styling
+                    fundElement.innerHTML = `
+                        <h2>${fund.name}</h2>
+                        <p>Returns: ${fund.returns}</p>
+                        <p>Expense Ratio: ${fund.expenseRatio}</p>
+                    `;
+                    container.appendChild(fundElement);
+                });
+            })
+            .catch(error => console.error('Error fetching mutual fund data:', error));
+    </script>
+</body>
+</html>

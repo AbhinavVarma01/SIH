@@ -1,0 +1,44 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+#mutual-fund-data {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+div.fund {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 20px;
+    width: 300px; /* Adjust width as needed */
+    transition: transform 0.2s;
+}
+
+div.fund:hover {
+    transform: scale(1.05);
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0;
+    color: #4CAF50; /* Green color for fund names */
+}
+
+p {
+    color: #555;
+    margin: 5px 0;
+    font-size: 1em;
+}

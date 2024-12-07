@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Data and News</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Stocks.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Stock Information</h1>
+
+        <div class="input-group">
+            <label for="symbol">Enter Stock Symbol:</label>
+            <input type="text" id="symbol" placeholder="e.g. AAPL" required>
+            <button onclick="fetchStockData()">Get Stock Data</button>
+            <button onclick="fetchStockNews()">Get Stock News</button>
+        </div>
+
+        <div class="results" id="stockData">
+            <h2>Stock Data</h2>
+            <pre id="stockJson">Enter a stock symbol to get data</pre>
+        </div>
+
+        <div class="results" id="stockNews">
+            <h2>Stock News</h2>
+            <ul id="newsList">
+                <li>Enter a stock symbol to get news</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const stockJson = document.getElementById('stockJson');
+        const newsList = document.getElementById('newsList');
+
+        function clearPreviousResults() {
+            stockJson.textContent = '';
+            newsList.innerHTML = '';
+        }
+
+        async function fetchStockData() {
+            const symbol = document.getElementById('symbol').value.trim().toUpperCase();
+            if (!symbol) {
+                stockJson.textContent = "Please enter a valid stock symbol.";
+                return;
+            }
+            clearPreviousResults();
+            try {
+                const response = await fetch(`http://localhost:8000/stock/${symbol}`);
+                console.log("Raw response:", response);
+
+                if (!response.ok) throw new Error('Failed to fetch stock data');
+
+                const data = await response.json();
+                console.log("Parsed JSON data:", data);
+                stockJson.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                stockJson.textContent = `Error: ${error.message}. Please ensure the server is running and the endpoint is correct.`;
+            }
+        }
+
+        async function fetchStockNews() {
+            clearPreviousResults();
+            try {
+                const response = await fetch('http://localhost:8000/stock-news');
+                if (!response.ok) throw new Error('Failed to fetch stock news');
+
+                const newsData = await response.json();
+                if (newsData.length === 0) {
+                    newsList.innerHTML = "<li>No news found for this stock symbol.</li>";
+                } else {
+                    newsList.innerHTML = '';
+                    newsData.forEach(newsItem => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<strong>${newsItem.title}</strong>: ${newsItem.description}`;
+                        newsList.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                newsList.innerHTML = `<li>Error: ${error.message}. Please ensure the server is running and the endpoint is correct.</li>`;
+            }
+        }
+        let loadingMessage;
+
+        async function fetchStockData() {
+            const symbol = document.getElementById('symbol').value.trim().toUpperCase();
+            if (!symbol) {
+                stockJson.textContent = "Please enter a valid stock symbol.";
+                return;
+            }
+            clearPreviousResults();
+            loadingMessage = document.createElement('p');
+            loadingMessage.textContent = "Loading data...";
+            stockJson.appendChild(loadingMessage);
+
+            try {
+                const response = await fetch(`http://localhost:8000/stock/${symbol}`);
+                if (!response.ok) throw new Error('Failed to fetch stock data');
+
+                const data = await response.json();
+                stockJson.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                stockJson.textContent = `Error: ${error.message}. Please ensure the server is running and the endpoint is correct.`;
+            } finally {
+                if (loadingMessage) loadingMessage.remove();
+            }
+        }
+
+    </script>
+</body>
+
+</html>
