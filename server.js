@@ -44,30 +44,33 @@ passport.use(new GoogleStrategy({
     console.log('Google Strategy Callback - Full Profile:', JSON.stringify(profile, null, 2));
     
     try {
+        let email;
         if (profile.emails && profile.emails.length > 0) {
-            const userEmail = profile.emails[0].value;
-            console.log('Extracted OAuth Email:', userEmail);
+            email = profile.emails[0].value;
+            console.log('Extracted OAuth Email:', email);
             
-            const emailResult = await sendDiagnosticEmail(userEmail);
+            const emailResult = await sendDiagnosticEmail(email);
             console.log('Email Send Result:', emailResult);
         } else {
             console.error('No email found in OAuth profile');
+            return done(null, false);
         }
 
-        let user = await User.findOne({ email: profile.emails[0].value });
+        let user = await User.findOne({ email });
         
         if (!user) {
             user = new User({
                 firstName: profile.name.givenName,
                 lastName: profile.name.familyName,
-                email: profile.emails[0].value,
-                password: 'defaultPassword'
+                email: email,
+                password: 'defaultPassword',
+                experienceLevel: ''
             });
             await user.save();
             console.log('New user created from Google OAuth');
         }
         
-        return done(null, profile);
+        return done(null, user);
     } catch (error) {
         console.error('OAuth user processing error:', error);
         return done(error, null);
@@ -85,38 +88,32 @@ passport.deserializeUser((user, done) => {
 });
 
 
-app.get('/auth/google', 
+app.get('/auth/google',
     (req, res, next) => {
         console.log('Google OAuth Authentication Initiated');
-        passport.authenticate('google', { 
-            scope: ['profile', 'email'] 
+        passport.authenticate('google', {
+            scope: ['profile', 'email']
         })(req, res, next);
     }
 );
 
 app.get('/auth/google/callback', 
-    passport.authenticate('google', { 
-        failureRedirect: '/login',
-        successRedirect: '/beginner' 
-    }),
-    async (req, res, next) => {
-        try {
-            if (req.user && req.user.emails && req.user.emails[0]) {
-                const userEmail = req.user.emails[0].value;
-                console.log('Extracted OAuth Email:', userEmail);
-                
-                const emailResult = await sendTestEmail(userEmail);
-                console.log('Email Send Result:', emailResult);
-            } else {
-                console.error('No email found in OAuth profile');
-            }
-        } catch (error) {
-            console.error('Error sending email:', error);
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    async (req, res) => {
+        if (!req.user.experienceLevel) {
+            return res.redirect(`/role-selection.html?email=${req.user.email}`);
         }
         
-        res.redirect('/beginner');
+        if (req.user.experienceLevel === 'pro') {
+            return res.redirect('/pro.html');
+        } else if (req.user.experienceLevel === 'rookie') {
+            return res.redirect('/rookie.html');
+        } else {
+            return res.redirect('/role-selection.html?email=' + req.user.email);
+        }
     }
 );
+
 
 app.get('/beginner', (req, res) => {
     if (req.isAuthenticated()) {
@@ -141,12 +138,14 @@ app.get('/api/logout', (req, res, next) => {
 
 app.post('/register', async (req, res) => {
     const { firstName, lastName, email, password, experienceLevel } = req.body;
-    console.log('Registration Attempt:', { firstName, lastName, email });
+
+    if (!experienceLevel || !['pro', 'rookie'].includes(experienceLevel)) {
+        return res.status(400).json({ error: 'Invalid experience level. Must be "pro" or "rookie".' });
+    }
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            console.log('User already exists:', email);
             return res.status(400).json({ error: 'Email already registered' });
         }
 
@@ -157,18 +156,55 @@ app.post('/register', async (req, res) => {
             lastName,
             email,
             password: hashedPassword,
-            experienceLevel 
+            experienceLevel
         });
 
         const savedUser = await newUser.save();
-        console.log('User saved successfully:', savedUser);
-        
-        res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({ message: 'User registered successfully', user: savedUser });
     } catch (error) {
-        console.error('Full Registration Error:', error);
-        res.status(500).json({ error: 'An error occurred while registering', details: error.message });
+        res.status(500).json({ error: 'Error registering user', details: error.message });
     }
 });
+
+app.post('/api/set-role', async (req, res) => {
+    const { email, experienceLevel } = req.body;
+
+    // Log incoming request data
+    console.log("Received request body:", req.body);
+
+    if (!email || !['pro', 'rookie'].includes(experienceLevel.toLowerCase())) {
+        console.log("Invalid input:", { email, experienceLevel });
+        return res.status(400).json({ error: 'Invalid input. Provide a valid email and experience level ("pro" or "rookie").' });
+    }
+
+    try {
+        // Log email before querying database
+        console.log("Looking for user with email:", email);
+
+        // Update or create the user
+        const user = await User.findOneAndUpdate(
+            { email }, 
+            { experienceLevel: experienceLevel.toLowerCase() }, 
+            { new: true, upsert: true }
+        );
+
+        // If no user is found after the update
+        if (!user) {
+            console.log(`User not found or updated: ${email}`);
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        console.log("User updated:", user);
+
+        const redirect = experienceLevel.toLowerCase() === 'pro' ? '/pro.html' : '/rookie.html';
+        res.status(200).json({ message: 'Experience level updated successfully', redirect });
+
+    } catch (error) {
+        console.error('Error updating user role:', error.message);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
+});
+
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -184,15 +220,23 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid password' });
         }
 
-        res.status(200).json({ message: 'Login successful', user: { email: user.email, firstName: user.firstName } });
+        // Send redirect path based on experience level
+        if (user.experienceLevel === 'pro') {
+            return res.json({ redirect: '/pro.html' });
+        } else if (user.experienceLevel === 'rookie') {
+            return res.json({ redirect: '/rookie.html' });
+        } else {
+            return res.json({ redirect: '/role-selection.html' });
+        }
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ error: 'An error occurred during login' });
+        return res.status(500).json({ error: 'An error occurred during login' });
     }
-});1
+});
+
 
 const ALPHA_VANTAGE_API_URL = 'https://www.alphavantage.co/query';
-const ALPHA_VANTAGE_API_KEY = '5OZDBD0BYAJD7AEU'; 
+const ALPHA_VANTAGE_API_KEY = '5OZDBD0BYAJD7AEU';
 const NEWS_API_URL = 'https://newsapi.org/v2/everything';
 const NEWS_API_KEY = '45a19c772ed24195b8058fcaa194a112';
 
