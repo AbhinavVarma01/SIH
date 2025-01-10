@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome - Login / Register</title>
+    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<body>
+    <nav class="nav-header">
+        <a href="index.html" class="nav-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 6l-9.5 9.5-5-5L1 18" />
+                <path d="M17 6h6v6" />
+            </svg>
+            InWiseNext
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="aboutus.html">About Us</a>
+        </div>
+    </nav>
+    <div class="page-wrapper">
+        <div class="auth-container glass">
+            <div class="card-decoration">
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+            <div class="forms-wrapper" id="formsWrapper">
+                <div class="form-container" id="loginForm">
+                    <div class="form-header">
+                        <div class="icon-container">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h2>Welcome Back</h2>
+                        <p class="subtitle">Sign in to continue your journey</p>
+                    </div>
+                    <form onsubmit="handleLogin(event)" class="animated-form">
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" placeholder="Email" required class="glass-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" placeholder="Password" required class="glass-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                                <select class="glass-input" required>
+                                    <option value="" disabled selected>Select Experience Level</option>
+                                    <option value="rookie">Rookie</option>
+                                    <option value="pro">Pro</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group remember-me">
+                            <label>
+                                <input type="checkbox" name="remember" /> Remember Me
+                            </label>
+                            <a href="#" class="forgot-password">Forgot password?</a>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                        <div class="divider">
+                            <span>or</span>
+                        </div>
+                        <div class="google-login">
+                            <a href="/auth/google" class="google-btn">
+                                <i class="fa-brands fa-google"></i> Login with Google
+                            </a>
+                        </div>
+                        <p class="switch-text">
+                            New user? <a href="#" onclick="toggleForms()">Create account</a>
+                        </p>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div class="form-container hidden" id="registerForm">
+                    <div class="form-header">
+                        <div class="icon-container">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h2>Create Account</h2>
+                        <p class="subtitle">Join our community today</p>
+                    </div>
+                    <form onsubmit="handleRegister(event)" class="animated-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" placeholder="First Name" required class="glass-input">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" placeholder="Last Name" required class="glass-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" placeholder="Email" required class="glass-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" placeholder="Password" required class="glass-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                                <select id="level" class="glass-input" required>
+                                    <option value="" disabled selected>Select Experience Level</option>
+                                    <option value="rookie">Rookie</option>
+                                    <option value="pro">Pro</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </button>
+                        <div class="divider">
+                            <span>or</span>
+                        </div>
+                        <div class="google-login">
+                            <a href="/auth/google" class="google-btn">
+                                <i class="fa-brands fa-google"></i> Sign up with Google
+                            </a>
+                        </div>
+                        <p class="switch-text">
+                            Already have an account? <a href="#" onclick="toggleForms()">Login</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="login.js"></script>
+</body>
+
+</html>
